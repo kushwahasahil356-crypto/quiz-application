@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ज्ञान क्विज़</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family:
+        "Noto Sans Devanagari",
+        "Segoe UI",
+        sans-serif;
+      background: #f6f7f9;
+      color: #18181b;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 680px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      background: #18181b;
+      color: white;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 16px;
+      font-size: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 7px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      color: #71717a;
+      font-size: 14px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e4e4e7;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    }
+
+    .topics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .topic {
+      border: 1px solid #e4e4e7;
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px 12px;
+      cursor: pointer;
+      transition: 0.2s;
+      text-align: center;
+    }
+
+    .topic:hover {
+      border-color: #18181b;
+      transform: translateY(-2px);
+    }
+
+    .topic-icon {
+      font-size: 25px;
+      margin-bottom: 10px;
+    }
+
+    .topic-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .topic-desc {
+      color: #71717a;
+      font-size: 11px;
+      margin-top: 5px;
+    }
+
+    .quiz {
+      display: none;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #71717a;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .progress {
+      height: 5px;
+      background: #e4e4e7;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #18181b;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .question {
+      font-size: 22px;
+      line-height: 1.5;
+      font-weight: 600;
+      margin-bottom: 22px;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      width: 100%;
+      padding: 15px 17px;
+      border: 1px solid #e4e4e7;
+      background: #fff;
+      border-radius: 12px;
+      text-align: left;
+      font-family: inherit;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .option:hover {
+      border-color: #a1a1aa;
+      background: #fafafa;
+    }
+
+    .option.correct {
+      border-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .option.wrong {
+      border-color: #dc2626;
+      background: #fef2f2;
+    }
+
+    .option:disabled {
+      cursor: default;
+    }
+
+    .next-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      border: none;
+      border-radius: 11px;
+      background: #18181b;
+      color: white;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .next-btn:hover {
+      background: #27272a;
+    }
+
+    .result {
+      display: none;
+      text-align: center;
+      padding: 20px 0 5px;
+    }
+
+    .score {
+      font-size: 54px;
+      font-weight: 700;
+      margin: 15px 0 5px;
+    }
+
+    .result-text {
+      color: #71717a;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+
+    .restart {
+      border: none;
+      background: #18181b;
+      color: white;
+      padding: 13px 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .back {
+      background: transparent;
+      border: none;
+      color: #71717a;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      margin-top: 16px;
+    }
+
+    .back:hover {
+      color: #18181b;
+    }
+
+    @media (max-width: 550px) {
+      body {
+        padding: 15px;
+        align-items: flex-start;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .topics {
+        grid-template-columns: 1fr;
+      }
+
+      .question {
+        font-size: 19px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="app">
+
+    <header class="header">
+      <div class="logo">✦</div>
+      <h1>ज्ञान क्विज़</h1>
+      <p class="subtitle">अपना विषय चुनें और अपनी जानकारी परखें</p>
+    </header>
+
+    <!-- Topic Selection -->
+    <section class="card" id="topicScreen">
+
+      <div class="topics">
+
+        <button class="topic" onclick="startQuiz('science')">
+          <div class="topic-icon">🔬</div>
+          <div class="topic-name">विज्ञान</div>
+          <div class="topic-desc">सामान्य विज्ञान</div>
+        </button>
+
+        <button class="topic" onclick="startQuiz('astronomy')">
+          <div class="topic-icon">🌌</div>
+          <div class="topic-name">खगोल विज्ञान</div>
+          <div class="topic-desc">अंतरिक्ष और ब्रह्मांड</div>
+        </button>
+
+        <button class="topic" onclick="startQuiz('chemistry')">
+          <div class="topic-icon">⚗️</div>
+          <div class="topic-name">रसायन विज्ञान</div>
+          <div class="topic-desc">तत्व और अभिक्रियाएँ</div>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- Quiz -->
+    <section class="card quiz" id="quizScreen">
+
+      <div class="topbar">
+        <span id="topicTitle">विज्ञान</span>
+        <span id="questionCount">1 / 5</span>
+      </div>
+
+      <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <div class="question" id="question"></div>
+
+      <div class="options" id="options"></div>
+
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">
+        अगला प्रश्न →
+      </button>
+
+      <button class="back" onclick="goHome()">
+        ← विषय बदलें
+      </button>
+
+    </section>
+
+    <!-- Result -->
+    <section class="card result" id="resultScreen">
+
+      <div style="font-size: 35px;">🎉</div>
+
+      <div class="score" id="finalScore">0/5</div>
+
+      <p class="result-text" id="resultText">
+        अच्छा प्रयास!
+      </p>
+
+      <button class="restart" onclick="goHome()">
+        दोबारा खेलें
+      </button>
+
+    </section>
+
+  </main>
+
+<script>
+const quizData = {
+
+  science: [
+    {
+      q: "पौधों में भोजन बनाने की प्रक्रिया को क्या कहा जाता है?",
+      options: [
+        "प्रकाश संश्लेषण",
+        "श्वसन",
+        "पाचन",
+        "वाष्पीकरण"
+      ],
+      answer: 0
+    },
+    {
+      q: "मानव शरीर में रक्त को पंप करने वाला अंग कौन-सा है?",
+      options: [
+        "फेफड़ा",
+        "हृदय",
+        "यकृत",
+        "गुर्दा"
+      ],
+      answer: 1
+    },
+    {
+      q: "पृथ्वी पर जीवन के लिए सबसे महत्वपूर्ण गैसों में से एक कौन-सी है?",
+      options: [
+        "ऑक्सीजन",
+        "हीलियम",
+        "नियॉन",
+        "आर्गन"
+      ],
+      answer: 0
+    },
+    {
+      q: "ध्वनि किस माध्यम में यात्रा कर सकती है?",
+      options: [
+        "केवल निर्वात में",
+        "ठोस, द्रव और गैस में",
+        "केवल गैस में",
+        "केवल प्रकाश में"
+      ],
+      answer: 1
+    },
+    {
+      q: "जल का सामान्य क्वथनांक समुद्र तल पर कितना होता है?",
+      options: [
+        "50°C",
+        "75°C",
+        "100°C",
+        "150°C"
+      ],
+      answer: 2
+    }
+  ],
+
+  astronomy: [
+    {
+      q: "सौरमंडल का सबसे बड़ा ग्रह कौन-सा है?",
+      options: [
+        "पृथ्वी",
+        "मंगल",
+        "बृहस्पति",
+        "शनि"
+      ],
+      answer: 2
+    },
+    {
+      q: "पृथ्वी का एकमात्र प्राकृतिक उपग्रह कौन है?",
+      options: [
+        "चंद्रमा",
+        "सूर्य",
+        "शुक्र",
+        "फोबोस"
+      ],
+      answer: 0
+    },
+    {
+      q: "सूर्य किस प्रकार का खगोलीय पिंड है?",
+      options: [
+        "ग्रह",
+        "तारा",
+        "उपग्रह",
+        "क्षुद्रग्रह"
+      ],
+      answer: 1
+    },
+    {
+      q: "हमारी आकाशगंगा का नाम क्या है?",
+      options: [
+        "एंड्रोमेडा",
+        "मिल्की वे",
+        "ओरायन",
+        "सोमब्रेरो"
+      ],
+      answer: 1
+    },
+    {
+      q: "सूर्य के सबसे निकट कौन-सा ग्रह है?",
+      options: [
+        "शुक्र",
+        "पृथ्वी",
+        "बुध",
+        "मंगल"
+      ],
+      answer: 2
+    }
+  ],
+
+  chemistry: [
+    {
+      q: "पानी का रासायनिक सूत्र क्या है?",
+      options: [
+        "CO₂",
+        "H₂O",
+        "O₂",
+        "NaCl"
+      ],
+      answer: 1
+    },
+    {
+      q: "ऑक्सीजन का रासायनिक प्रतीक क्या है?",
+      options: [
+        "Ox",
+        "O",
+        "Og",
+        "O₂H"
+      ],
+      answer: 1
+    },
+    {
+      q: "नमक का सामान्य रासायनिक सूत्र क्या है?",
+      options: [
+        "H₂O",
+        "NaCl",
+        "CO₂",
+        "CH₄"
+      ],
+      answer: 1
+    },
+    {
+      q: "आवर्त सारणी में हाइड्रोजन का परमाणु क्रमांक क्या है?",
+      options: [
+        "1",
+        "2",
+        "8",
+        "10"
+      ],
+      answer: 0
+    },
+    {
+      q: "CO₂ में C किस तत्व का प्रतीक है?",
+      options: [
+        "कैल्शियम",
+        "कार्बन",
+        "क्लोरीन",
+        "कोबाल्ट"
+      ],
+      answer: 1
+    }
+  ]
+};
+
+let currentTopic = "";
+let currentQuestion = 0;
+let score = 0;
+
+const topicNames = {
+  science: "विज्ञान",
+  astronomy: "खगोल विज्ञान",
+  chemistry: "रसायन विज्ञान"
+};
+
+function startQuiz(topic) {
+  currentTopic = topic;
+  currentQuestion = 0;
+  score = 0;
+
+  document.getElementById("topicScreen").style.display = "none";
+  document.getElementById("resultScreen").style.display = "none";
+  document.getElementById("quizScreen").style.display = "block";
+
+  document.getElementById("topicTitle").textContent =
+    topicNames[topic];
+
+  showQuestion();
+}
+
+function showQuestion() {
+  const quiz = quizData[currentTopic];
+  const question = quiz[currentQuestion];
+
+  document.getElementById("questionCount").textContent =
+    `${currentQuestion + 1} / ${quiz.length}`;
+
+  document.getElementById("progressBar").style.width =
+    `${((currentQuestion + 1) / quiz.length) * 100}%`;
+
+  document.getElementById("question").textContent =
+    question.q;
+
+  const optionsContainer =
+    document.getElementById("options");
+
+  optionsContainer.innerHTML = "";
+
+  question.options.forEach((option, index) => {
+    const button = document.createElement("button");
+
+    button.className = "option";
+    button.textContent = option;
+
+    button.onclick = () => selectAnswer(index);
+
+    optionsContainer.appendChild(button);
+  });
+
+  document.getElementById("nextBtn").style.display = "none";
+}
+
+function selectAnswer(selected) {
+  const quiz = quizData[currentTopic];
+  const question = quiz[currentQuestion];
+  const buttons = document.querySelectorAll(".option");
+
+  buttons.forEach(button => {
+    button.disabled = true;
+  });
+
+  if (selected === question.answer) {
+    buttons[selected].classList.add("correct");
+    score++;
+  } else {
+    buttons[selected].classList.add("wrong");
+    buttons[question.answer].classList.add("correct");
+  }
+
+  const nextButton = document.getElementById("nextBtn");
+
+  nextButton.style.display = "block";
+
+  if (currentQuestion === quiz.length - 1) {
+    nextButton.textContent = "परिणाम देखें";
+  }
+}
+
+function nextQuestion() {
+  const quiz = quizData[currentTopic];
+
+  if (currentQuestion < quiz.length - 1) {
+    currentQuestion++;
+    showQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById("quizScreen").style.display = "none";
+  document.getElementById("resultScreen").style.display = "block";
+
+  const total = quizData[currentTopic].length;
+
+  document.getElementById("finalScore").textContent =
+    `${score}/${total}`;
+
+  let message = "";
+
+  const percentage = (score / total) * 100;
+
+  if (percentage === 100) {
+    message = "शानदार! आपने सभी प्रश्न सही किए।";
+  } else if (percentage >= 60) {
+    message = "बहुत अच्छा! आपकी जानकारी अच्छी है।";
+  } else if (percentage >= 40) {
+    message = "अच्छा प्रयास! थोड़ा और अभ्यास करें।";
+  } else {
+    message = "कोई बात नहीं। दोबारा कोशिश करें और अपना स्कोर बढ़ाएँ।";
+  }
+
+  document.getElementById("resultText").textContent = message;
+}
+
+function goHome() {
+  document.getElementById("quizScreen").style.display = "none";
+  document.getElementById("resultScreen").style.display = "none";
+  document.getElementById("topicScreen").style.display = "block";
+}
+</script>
+
+</body>
+</html>
